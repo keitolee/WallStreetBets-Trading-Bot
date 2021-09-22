@@ -23,17 +23,7 @@ def check_records(stocks):
                     line_count += 1
             
         if already_holding == False:
-
-            # with open('current_holdings.csv', 'a') as csv_file:
-            #     writer = csv.writer(csv_file)
-
-            #     if count == 0:
-            #         writer.writerow([])
-
-            #     writer.writerow([current_ticker])
             stocks_to_buy.append(current_ticker)
-                
-            # count+=1
     
     return stocks_to_buy
 

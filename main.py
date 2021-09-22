@@ -1,5 +1,6 @@
 from getTicker import redditTicker
 from records import check_records
+from records import update_buys
 import accounts
 import records
 
@@ -14,7 +15,7 @@ buy_stocks = check_records(buyStocks)
 
 
 # Update buy_transactions and current_holdings sheet
-
+# update_buys(stocks that were actually bought)
 
 # Check current_holdings sheet for potential sells and sell if meets target
 
