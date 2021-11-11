@@ -42,4 +42,16 @@ def update_buys(stocks):
             writer.writerow(row)
 
 
+def update_current_holdings(stocks):
 
+    row_list = []
+
+    for stock in stocks:
+        row_list.append(stock)
+
+    list_of_list = [[el] for el in row_list]
+
+    with open('test.csv', mode='a') as csv_file:
+        writer = csv.writer(csv_file)
+        for row in list_of_list:
+            writer.writerow(row)
