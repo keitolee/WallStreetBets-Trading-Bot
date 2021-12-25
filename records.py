@@ -1,29 +1,22 @@
 import csv
+import json
 from os import write
 from datetime import date
 
 def check_records(stocks):
-    count = 0
     stocks_to_buy = []
 
     for stock in stocks:
-        current_ticker = stock[0]
-        already_holding = False
+        with open('current_holdings.json','r') as json_file:
+            data = json_file.read()
+            jsonObj = json.loads(data)
 
-        with open('current_holdings.csv') as csv_file:
-            csv_reader = csv.reader(csv_file, delimiter=',')
-            line_count = 0
-
-            for row in csv_reader:
-                if line_count == 0:
-                    line_count += 1
-                else:
-                    if current_ticker == row[0]:
-                        already_holding = True
-                    line_count += 1
-            
-        if already_holding == False:
-            stocks_to_buy.append(current_ticker)
+            try:
+                jsonObj[stock]
+            except:
+                stocks_to_buy.append(stock)
+            else:
+                print("already holding " + stock)
     
     return stocks_to_buy
 

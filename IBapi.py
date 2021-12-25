@@ -4,6 +4,7 @@ import yfinance as yf
 import csv
 import pandas as pd
 import math
+import json
 
 def market_order(tickers):
     ib = IB()
@@ -24,7 +25,7 @@ def market_order(tickers):
         ib.sleep(5)
         curr_price = data.last
 
-        # if enough balance in account buy stock with max $200 buy
+        # if enough balance in account buy stock with max $200, buy stock
         if curr_balance >= curr_price and curr_price <= 200:
             buy_amount = floor(200/curr_price)
 
@@ -32,6 +33,15 @@ def market_order(tickers):
             trade = ib.placeOrder(stock, order)
             purchased_tickers.append(ticker)
             print(order)
+
+            ticker_info = {"priceBought": curr_price,"quantityBought": buy_amount}
+
+            # add purchased ticekrs into current holdings
+            with open('current_holdings.json','r+') as json_file:
+                file_data = json.load(json_file)
+                file_data[ticker] = ticker_info
+                json_file.seek(0)
+                json.dump(file_data, json_file, indent = 4)
     
     return purchased_tickers
 
