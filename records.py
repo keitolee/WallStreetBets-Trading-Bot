@@ -12,12 +12,12 @@ def check_records(stocks):
             jsonObj = json.loads(data)
 
             try:
-                jsonObj[stock]
+                jsonObj[stock[0]]
             except:
-                stocks_to_buy.append(stock)
+                stocks_to_buy.append(stock[0])
             else:
-                print("already holding " + stock)
-    
+                print("Already holding " + stock[0])
+
     return stocks_to_buy
 
 

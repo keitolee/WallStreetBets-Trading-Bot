@@ -42,50 +42,60 @@ def market_order(tickers):
                 file_data[ticker] = ticker_info
                 json_file.seek(0)
                 json.dump(file_data, json_file, indent = 4)
-    
+        else: 
+            print(ticker + " higher than $200 or not enough balance")
+
     return purchased_tickers
 
 
+def market_sell():
+    ib = IB()
+    ib.connect('127.0.0.1', 7497, clientId=1)
 
-# # Check for enough balance to pay for stock
-# stock = yf.Ticker("GME")
-# current_price = stock.history(period="1m", interval='1m')['Close'].mean()
+    with open('current_holdings.json','r+') as json_file:
+        file_data = json.load(json_file)
 
-# with open('current_balance.csv') as csv_file:
-#     csv_reader = csv.reader(csv_file, delimiter=',')
-#     line_count = 0
-#     for row in csv_reader:
-#         if line_count == 0:
-#             line_count += 1
-#         else:
-#             balance = float(f'{row[0]}')
-#             line_count += 1
+        # check every stock currently held
+        for ticker in list(file_data):
+            purchase_price = file_data[ticker]["priceBought"]
 
-# if(balance >= current_price):
+            stock = Stock(ticker, 'SMART', 'USD')
+
+            # get current price of stock
+            ib.qualifyContracts(stock)
+            data = ib.reqMktData(stock)
+            ib.sleep(5)
+            curr_price = data.last
+
+            # sell all holding amounts if price has gone up by at least 10%
+            if (curr_price - purchase_price) / purchase_price > 0.10:
+                sell_amount = file_data[ticker]["quantityBought"]
+                order = MarketOrder('SELL', sell_amount)
+                trade = ib.placeOrder(stock, order)
+                print(order)
+
+                # remove stock from current_holdings 
+                del file_data[ticker]
     
-#     contract = Stock('GME', 'SMART', 'USD')
+    # write updated list to json file
+    with open('current_holdings.json', 'w') as data_file:
+        data = json.dump(file_data, data_file)
 
 
-# stock = Stock('AMC', 'SMART', 'USD')
 
-# bars = ib.reqHistoricalData(
-#     stock, endDateTime='', durationStr='30 D',
-#     barSizeSetting='1 hour', whatToShow='MIDPOINT', useRTH=True
-# )
+# if __name__ == "__main__":
+#     buys = ["GME", "AMD"]
+#     # market_sell()
 
+#     with open('current_holdings.json','r+') as json_file:
+#         file_data = json.load(json_file)
+#         json_file.seek(0)
 
-# def orderFilled(order, fill):
-#     print('order has been filled')
-#     print(order)
-#     print(fill)
+#     # for ticker in list(file_data):
+#     #     del file_data[ticker]
 
-# trade.fillEvent += orderFilled
+#     del file_data['AMD']
+    
+#     with open('current_holdings.json', 'w') as data_file:
+#         data = json.dump(file_data, data_file)
 
-# ib.run()
-
-# bars = ib.reqHistoricalData(
-#         stock, endDateTime='', durationStr='30 D',
-#     barSizeSetting='1 hour', whatToShow='MIDPOINT', useRTH=True)
-
-# df = util.df(bars)
-# print(df)
