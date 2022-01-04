@@ -1,6 +1,6 @@
 from getTicker import redditTicker
 from records import *
-from IBapi import market_order, market_sell
+from IBapi import IBKRorders
 import accounts
 import records
 
@@ -16,17 +16,15 @@ print("Stocks to buy: ")
 print(buy_stocks)
 
 # Buy stocks in buy_stocks list using Interactive Brokers API ( -> list of tickers actually bought)
-purchased_stocks = market_order(buy_stocks)
+IBKRobj = IBKRorders()
+purchased_stocks = IBKRobj.market_order(buy_stocks)
 print("Purchased stocks: ")
 print(purchased_stocks)
 
-# # Update current_holdings sheet with stocks bought
-# update_current_holdings(purchased_stocks)
-
-# update_buys(stocks that were actually bought)
-
 # Check current_holdings for potential sells and sell if meets target
-market_sell()
+sold_stocks = IBKRobj.market_sell()
+print("Sold stocks: ")
+print(sold_stocks)
 
 # Update sell_transactions sheet
 
