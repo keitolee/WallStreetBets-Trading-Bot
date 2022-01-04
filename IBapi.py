@@ -5,12 +5,14 @@ import csv
 import pandas as pd
 import math
 import json
+import datetime
 
 class IBKRorders:
 
     def __init__(self) -> None:
         self.ib = IB()
         self.ib.connect('127.0.0.1', 7497, clientId=1)
+
 
     def market_order(self, tickers):
 
@@ -46,6 +48,10 @@ class IBKRorders:
                     file_data[ticker] = ticker_info
                     json_file.seek(0)
                     json.dump(file_data, json_file, indent = 4)
+                
+                # update transactions.csv
+                self.update_transactions("BUY", ticker, curr_price, buy_amount)
+
             else: 
                 print(ticker + " higher than $200 or not enough balance")
 
@@ -83,6 +89,9 @@ class IBKRorders:
 
                     # add stock to return list
                     sell_list.append(ticker)
+
+                    # update transactions.csv
+                    self.update_transactions("SELL", ticker, curr_price, sell_amount)
         
         # write updated list to json file
         with open('current_holdings.json', 'w') as data_file:
@@ -90,21 +99,34 @@ class IBKRorders:
 
         return sell_list
 
+    
+    def update_transactions(self, action, ticker, price, amount):
+        
+        row = [str(datetime.datetime.now()), action, ticker, price, amount]
+
+        with open('transactions.csv', mode='a') as csv_file:
+            writer = csv.writer(csv_file)
+            writer.writerow(row)
+
 
 
 # if __name__ == "__main__":
 #     buys = ["GME", "AMD"]
-#     # market_sell()
+#     obj = IBKRorders()
 
-#     with open('current_holdings.json','r+') as json_file:
-#         file_data = json.load(json_file)
-#         json_file.seek(0)
+#     obj.update_transactions("BUY", "GRE", "100", "40")
 
-#     # for ticker in list(file_data):
-#     #     del file_data[ticker]
+    # market_sell()
 
-#     del file_data['AMD']
+    # with open('current_holdings.json','r+') as json_file:
+    #     file_data = json.load(json_file)
+    #     json_file.seek(0)
+
+    # # for ticker in list(file_data):
+    # #     del file_data[ticker]
+
+    # del file_data['AMD']
     
-#     with open('current_holdings.json', 'w') as data_file:
-#         data = json.dump(file_data, data_file)
+    # with open('current_holdings.json', 'w') as data_file:
+    #     data = json.dump(file_data, data_file)
 
